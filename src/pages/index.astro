@@ -1,0 +1,327 @@
+---
+	
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Para Angelita</title>
+	</head>
+	<body>
+		<main>
+			<div class="container-letter">
+				<div class="cover"></div>
+				<span class="heart-left">♥</span>
+				<span class="heart-center">♥</span>
+				<span class="heart-right">♥</span>
+				<p class="paper" id="mainMessage">
+					Hola hermanita Angela, hoy en este día tan especial queremos desearte lo mejor, sabes que cuentas con nosotros, en las buenas y en las malas, siempre vamos a estar a tu lado.
+				</p>
+				<div class="letter"></div>
+			</div>
+			<div class="options">
+				<button id="open">Abrir</button>
+				<button id="close">Cerrar</butto>
+			</div>
+		</main>
+	</body>
+</html>
+
+<script>
+	import confetti from 'canvas-confetti';
+	// read custom message from query strings
+// Tutorial -> https://youtu.be/6ojp1iWUKw8
+
+const urlSearchParams = new URLSearchParams(window.location.search)
+
+const messageCustom = urlSearchParams.get('message')
+
+function randomInRange(min: number, max: number) {
+  return Math.random() * (max - min) + min;
+}
+
+function fireball () {
+	var duration = 10 * 1000;
+	var animationEnd = Date.now() + duration;
+	var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+	var interval = setInterval(function() {
+	  var timeLeft = animationEnd - Date.now();
+	
+	  if (timeLeft <= 0) {
+		return clearInterval(interval);
+	  }
+	
+	  var particleCount = 50 * (timeLeft / duration);
+	  // since particles fall down, start a bit higher than random
+	  confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.5), y: Math.random() - 0.2 } });
+	  confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 1), y: Math.random() - 0.2 } });
+	}, 250);
+}
+
+
+if (messageCustom) {
+
+  const mainMessageElement = document.querySelector('#mainMessage')
+  if(mainMessageElement)
+  mainMessageElement.textContent = decodeURI(messageCustom)
+}
+
+// the tutorial starts here
+
+const btnOpenElement: HTMLButtonElement | null = document.querySelector('#open')
+const btnCloseElement: HTMLButtonElement | null = document.querySelector('#close')
+if(btnCloseElement && btnOpenElement) {
+
+	btnCloseElement.disabled = true
+	
+	
+	
+	btnOpenElement.addEventListener('click', ()=> {
+	  btnOpenElement.disabled = true
+	  btnCloseElement.disabled = false
+	  const coverElement:HTMLDivElement|null = document.querySelector('.cover')
+	  if(!coverElement) return
+	  coverElement.classList.add('open-cover')
+	  fireball()
+	
+	  setTimeout(()=>{
+		//
+		coverElement.style.zIndex = "-1"
+		
+		const paperElement = document.querySelector('.paper')
+		if(!paperElement) return
+		paperElement.classList.remove('close-paper')
+		paperElement.classList.add('open-paper')
+	
+		// animacion del corazón
+		const heartElementLeft: HTMLDivElement | null = document.querySelector('.heart-left')
+		const heartElementCenter: HTMLDivElement | null = document.querySelector('.heart-center')
+		const heartElementRight: HTMLDivElement | null = document.querySelector('.heart-right')
+		if(!heartElementLeft || !heartElementCenter || !heartElementRight) return
+		heartElementLeft.style.display = 'block'
+		heartElementCenter.style.display = 'block'
+		heartElementRight.style.display = 'block'
+	  
+	  }, 500)
+	
+	})
+	btnCloseElement.addEventListener('click', ()=> {
+	  btnOpenElement.disabled = false
+	  btnCloseElement.disabled = true
+	
+	  const coverElement: HTMLDivElement | null = document.querySelector('.cover')
+	  const paperElement: HTMLDivElement | null = document.querySelector('.paper')
+	  if(!coverElement || !paperElement) return
+	  paperElement.classList.remove('open-paper')
+	  paperElement.classList.add('close-paper')
+	  
+	  setTimeout(()=>{
+		coverElement.style.zIndex = "0"
+		coverElement.classList.remove('open-cover')
+	
+		// animacion del corazón
+		const heartElementLeft: HTMLDivElement | null = document.querySelector('.heart-left')
+		const heartElementCenter: HTMLDivElement | null = document.querySelector('.heart-center')
+		const heartElementRight: HTMLDivElement | null = document.querySelector('.heart-right')
+		if(!heartElementLeft || !heartElementCenter || !heartElementRight) return
+		heartElementLeft.style.display = 'none'
+		heartElementCenter.style.display = 'none'
+		heartElementRight.style.display = 'none'
+	  },500)
+	})
+}
+
+</script>
+
+<style>
+/* reset css */
+
+* {
+  min-width: 0;
+  font: inherit;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+video,
+svg {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* styles */
+/* TODO: Cambiar la fuente
+
+* {
+  font-family: comic-sans;
+} */
+
+body {
+  background-color: #fad7df;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  gap: 3rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.container-letter {
+  position: relative;
+}
+
+.cover {
+  position: absolute;
+  border-left: 200px solid transparent;
+  border-right: 200px solid transparent;
+  border-top: 100px solid #fe3334;
+  border-bottom: 100px solid transparent;
+
+  /*  */
+  transition: transform .75s;
+  transform-origin: top;
+}
+
+.paper {
+  position: absolute;
+  padding: 1.5rem;
+  line-height: 2rem;
+  right: 5px;
+  /*  */
+  z-index: -1;
+  background: white;
+  width: 390px;
+  height: 180px;
+
+  transition: all .75s;
+}
+
+.letter {
+  border-left: 200px solid #ff989e;
+  border-right: 200px solid #ff989e;
+  border-top: 100px solid transparent;
+  border-bottom: 100px solid #ff858a;
+}
+
+.options {
+  display: flex;
+  gap: 5rem;
+
+  & button {
+    color: #ff3234;
+    font-weight: 600;
+    border-radius: 3px;
+    background: #fad7df;
+    padding: 0.5rem 1rem;
+    border: 1px solid #fe3334;
+    cursor: pointer;
+  }
+
+  & button:hover {
+    background: #ff989e;
+    color: white;
+  }
+}
+
+.open-cover {
+  transform: rotatex(180deg);
+}
+
+.open-paper {
+  animation: openPaper .5s forwards;
+}
+
+@keyframes openPaper {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: -150px;
+  }
+}
+
+.close-paper {
+  animation: closePaper .5s forwards;
+}
+
+@keyframes closePaper {
+  0% {
+    top: -150px;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+.heart-left {
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 0%;
+  	margin: auto;
+	font-size: 3rem;
+	color: #fe3334;
+	animation: crecer 1s forwards ;
+}
+
+.heart-center {
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 46.5%;
+  	margin: auto;
+	font-size: 3rem;
+	color: #fe3334;
+	animation: crecer 1s forwards ;
+}
+
+.heart-right {
+	display: none;
+	position: absolute;
+	top: 25%;
+	right: 0%;
+  	margin: auto;
+	font-size: 3rem;
+	color: #fe3334;
+	animation: crecer 1s forwards ;
+}
+
+@keyframes crecer {
+  0% {
+    scale: 1;
+    opacity: 1;
+  }
+  100% {
+    scale: 1;
+    opacity: 0;
+
+  }
+}
+</style>
